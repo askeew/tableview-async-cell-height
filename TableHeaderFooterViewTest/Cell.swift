@@ -1,14 +1,16 @@
 
 import Foundation
 import UIKit
+import PDFKit
 
 class Cell: UITableViewCell {
 
-    private lazy var myImage: UIImageView = {
-        let view = UIImageView(frame: .zero)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.contentMode = .scaleAspectFit
-        return view
+    lazy var pdfView: PDFView = {
+        let pdfView = PDFView()
+        pdfView.translatesAutoresizingMaskIntoConstraints = false
+        pdfView.autoScales = true
+        pdfView.displayMode = .singlePageContinuous
+        return pdfView
     }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -22,28 +24,30 @@ class Cell: UITableViewCell {
     }
 
     func update(with vm: ViewModel) {
-        myImage.image = vm.logo
+        if let data = vm.data {
+            pdfView.document = PDFDocument(data: data)
+        }
+        if let document = vm.pdf {
+            pdfView.document = document
+        }
+        layoutIfNeeded()
     }
 
     private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            myImage.heightAnchor.constraint(equalTo: heightAnchor),
-            myImage.widthAnchor.constraint(equalTo: widthAnchor),
-            ])
+        pdfView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor).isActive = true
+        pdfView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor).isActive = true
+        pdfView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
+        pdfView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
 
     private func setupViews() {
-        addSubview(myImage)
+        addSubview(pdfView)
         backgroundColor = .white
         selectionStyle = .none
     }
 
     struct ViewModel {
-        let logo: UIImage?
-    }
-
-    enum Logo {
-        case inApp(from: UIImage?)
-        case needsFetching(from: URL, fallback: UIImage?)
+        let data: Data?
+        let pdf: PDFDocument?
     }
 }
