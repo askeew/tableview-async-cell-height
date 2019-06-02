@@ -1,13 +1,16 @@
 
 import Foundation
 import UIKit
+import WebKit
 
 class Cell: UITableViewCell {
 
-    private lazy var myImage: UIImageView = {
-        let view = UIImageView(frame: .zero)
+    private var callback: (() -> Void)?
+
+    private lazy var webView: WKWebView = {
+        let view = WKWebView(frame: .zero)
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.contentMode = .scaleAspectFit
+        view.navigationDelegate = self
         return view
     }()
 
@@ -22,28 +25,46 @@ class Cell: UITableViewCell {
     }
 
     func update(with vm: ViewModel) {
-        myImage.image = vm.logo
+        webView.load(URLRequest(url: vm.url))
+        callback = vm.callback
+        print("update")
+        print("webView: \(webView.scrollView.contentSize)")
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
     }
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            myImage.heightAnchor.constraint(equalTo: heightAnchor),
-            myImage.widthAnchor.constraint(equalTo: widthAnchor),
+            webView.heightAnchor.constraint(equalTo: heightAnchor),
+            webView.widthAnchor.constraint(equalTo: widthAnchor),
             ])
     }
 
     private func setupViews() {
-        addSubview(myImage)
+        addSubview(webView)
         backgroundColor = .white
         selectionStyle = .none
     }
 
     struct ViewModel {
-        let logo: UIImage?
+        let url: URL
+        let callback: () -> Void
     }
+}
 
-    enum Logo {
-        case inApp(from: UIImage?)
-        case needsFetching(from: URL, fallback: UIImage?)
+extension Cell: WKNavigationDelegate {
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        webView.sizeToFit()
+        print("didFinish")
+        print("webView: \(webView.scrollView.contentSize)")
+        callback?()
+    }
+}
+
+extension Cell {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "estimatedProgress" {
+            print("progress \(webView.url?.absoluteString) \(Int(webView.estimatedProgress * 100)) %")
+        }
     }
 }
