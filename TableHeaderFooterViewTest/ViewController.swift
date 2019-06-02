@@ -3,8 +3,8 @@ import UIKit
 import PDFKit
 class ViewController: UITableViewController {
     let modelData = [
-        URL(string: "http://doc.morningstar.com/document/973bc7fd1a6665ea50925ae266973185.msdoc/?clientid=avanza&key=3728b8f503435715")!,
-//        URL(string: "http://doc.morningstar.com/document/f5446dafe9d2be780e7dabb65f0f3f74.msdoc/?clientid=avanza&key=3728b8f503435715")!,
+//        URL(string: "http://doc.morningstar.com/document/973bc7fd1a6665ea50925ae266973185.msdoc/?clientid=avanza&key=3728b8f503435715")!,
+        URL(string: "http://doc.morningstar.com/document/f5446dafe9d2be780e7dabb65f0f3f74.msdoc/?clientid=avanza&key=3728b8f503435715")!,
     ]
 
     override func viewDidLoad() {
@@ -31,18 +31,12 @@ class ViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: Cell.reuseIdentifier, for: indexPath) as? Cell else { return UITableViewCell() }
         print("go")
-//        if let document = PDFDocument(url: modelData[indexPath.row]) {
-//            cell.update(with: Cell.ViewModel(data: nil, pdf: document))
-//        }
-//        return cell
-
-
         NetworkManager().loadData(from: URLRequest(url: modelData[indexPath.row])) { data in
             DispatchQueue.main.async {
                 if let data = data {
-//                    tableView.beginUpdates()
+                    tableView.beginUpdates()
                     cell.update(with: Cell.ViewModel(data: data, pdf: nil))
-//                    tableView.endUpdates()
+                    tableView.endUpdates()
                     print("SUCESS!")
                 } else {
                     print("ERROR!")
@@ -55,7 +49,6 @@ class ViewController: UITableViewController {
 }
 
 public extension UIView {
-
     static var reuseIdentifier: String {
         return String(describing: self)
     }
