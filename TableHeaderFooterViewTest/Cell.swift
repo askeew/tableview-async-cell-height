@@ -5,7 +5,6 @@ import PDFKit
 
 class Cell: UITableViewCell {
 
-    //TODO: implement caching of pdf so we dont need to fetch it again if it scrolls out of view and back again
     lazy var pdfView: PDFView = {
         let pdfView = PDFView()
         pdfView.translatesAutoresizingMaskIntoConstraints = false
@@ -27,18 +26,19 @@ class Cell: UITableViewCell {
     func update(with vm: ViewModel) {
         if let data = vm.data {
             pdfView.document = PDFDocument(data: data)
-            print("new frame: \(String(describing: pdfView.documentView?.frame.size))")
+//            print("new frame: \(String(describing: pdfView.documentView?.frame.size))")
+            pdfView.heightAnchor.constraint(equalToConstant: pdfView.documentView?.frame.size.height ?? 20).isActive = true
         }
         if let document = vm.pdf {
             pdfView.document = document
         }
-        layoutIfNeeded()
-
     }
 
     private func setupConstraints() {
         pdfView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
-        pdfView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        let heightConstraint = pdfView.heightAnchor.constraint(equalTo: heightAnchor)
+        heightConstraint.priority = .defaultHigh
+        heightConstraint.isActive = true
     }
 
     private func setupViews() {

@@ -1,9 +1,9 @@
-
 import UIKit
 import PDFKit
+
 class ViewController: UITableViewController {
     let modelData = [
-//        URL(string: "http://doc.morningstar.com/document/973bc7fd1a6665ea50925ae266973185.msdoc/?clientid=avanza&key=3728b8f503435715")!,
+        URL(string: "http://doc.morningstar.com/document/973bc7fd1a6665ea50925ae266973185.msdoc/?clientid=avanza&key=3728b8f503435715")!,
         URL(string: "http://doc.morningstar.com/document/f5446dafe9d2be780e7dabb65f0f3f74.msdoc/?clientid=avanza&key=3728b8f503435715")!,
     ]
 
@@ -16,8 +16,8 @@ class ViewController: UITableViewController {
     }
 
     override func viewDidLayoutSubviews() {
-        tableView.subviews.filter({$0 is UITableViewCell}).forEach({print("viewDidLayoutSubviews.celler: \($0.frame.size)")})
-        print("viewDidLayoutSubviews.contentSize: \(tableView.contentSize.height)")
+//        tableView.subviews.filter({$0 is UITableViewCell}).forEach({print("viewDidLayoutSubviews.celler: \($0.frame.size)")})
+//        print("viewDidLayoutSubviews.contentSize: \(tableView.contentSize.height)")
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -30,20 +30,17 @@ class ViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: Cell.reuseIdentifier, for: indexPath) as? Cell else { return UITableViewCell() }
-        print("go")
-        NetworkManager().loadData(from: URLRequest(url: modelData[indexPath.row])) { data in
-            DispatchQueue.main.async {
-                if let data = data {
-                    tableView.beginUpdates()
-                    cell.update(with: Cell.ViewModel(data: data, pdf: nil))
-                    tableView.endUpdates()
-                    print("SUCESS!")
-                } else {
-                    print("ERROR!")
+        if cell.pdfView.document == nil {
+            NetworkManager().loadData(from: URLRequest(url: modelData[indexPath.row])) { data in
+                DispatchQueue.main.async {
+                    if let data = data {
+                        tableView.beginUpdates()
+                        cell.update(with: Cell.ViewModel(data: data, pdf: nil))
+                        tableView.endUpdates()
+                    }
                 }
             }
         }
-        print("return")
         return cell
     }
 }
