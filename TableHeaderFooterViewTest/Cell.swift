@@ -27,8 +27,10 @@ class Cell: UITableViewCell {
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            myImage.heightAnchor.constraint(equalTo: heightAnchor),
-            myImage.widthAnchor.constraint(equalTo: widthAnchor),
+            myImage.topAnchor.constraint(equalTo: topAnchor),
+            myImage.leadingAnchor.constraint(equalTo: leadingAnchor),
+            myImage.trailingAnchor.constraint(equalTo: trailingAnchor),
+            myImage.bottomAnchor.constraint(equalTo: bottomAnchor)
             ])
     }
 
