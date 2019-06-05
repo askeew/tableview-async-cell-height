@@ -29,10 +29,7 @@ class Cell: UITableViewCell {
     }
 
     private func resize(image: UIImage, newWidth: CGFloat) -> UIImage? {
-        let imageRatio = image.size.height / image.size.width
-        let newHeight = imageRatio * newWidth
-        let newSize = CGSize(width: newWidth, height: newHeight)
-        return image.resizeImageUsingVImage(size: newSize)
+        return image.resizeImageTo(newWidth: frame.width)
     }
 
     private func setupConstraints() {
@@ -62,8 +59,12 @@ class Cell: UITableViewCell {
 
 extension UIImage {
 
-    func resizeImageUsingVImage(size: CGSize) -> UIImage? {
-        let cgImage = self.cgImage!
+    func resizeImageTo(newWidth: CGFloat) -> UIImage? {
+        let imageRatio = size.height / size.width
+        let newHeight = imageRatio * newWidth
+        let newSize = CGSize(width: newWidth, height: newHeight)
+
+        guard let cgImage = cgImage else { return nil }
         var format = vImage_CGImageFormat(bitsPerComponent: 8, bitsPerPixel: 32, colorSpace: nil, bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.first.rawValue), version: 0, decode: nil, renderingIntent: CGColorRenderingIntent.defaultIntent)
         var sourceBuffer = vImage_Buffer()
         defer {
@@ -72,14 +73,13 @@ extension UIImage {
         var error = vImageBuffer_InitWithCGImage(&sourceBuffer, &format, nil, cgImage, numericCast(kvImageNoFlags))
         guard error == kvImageNoError else { return nil }
         // create a destination buffer
-        let scale = self.scale
-        let destWidth = Int(size.width)
-        let destHeight = Int(size.height)
+        let destWidth = Int(newSize.width)
+        let destHeight = Int(newSize.height)
         let bytesPerPixel = self.cgImage!.bitsPerPixel/8
         let destBytesPerRow = destWidth * bytesPerPixel
         let destData = UnsafeMutablePointer<UInt8>.allocate(capacity: destHeight * destBytesPerRow)
         defer {
-            destData.deallocate()//(capacity: destHeight * destBytesPerRow)
+            destData.deallocate()
         }
         var destBuffer = vImage_Buffer(data: destData, height: vImagePixelCount(destHeight), width: vImagePixelCount(destWidth), rowBytes: destBytesPerRow)
         // scale the image
