@@ -24,8 +24,8 @@ class Cell: UITableViewCell {
 
     func update(with vm: ViewModel) {
         let resizedImage = resize(image: vm.logo, newWidth: frame.width)
-//        myImage.transition(tImage: resizedImage)
         myImage.image = resizedImage
+        vm.callback(self)
     }
 
     private func resize(image: UIImage, newWidth: CGFloat) -> UIImage? {
@@ -52,22 +52,13 @@ class Cell: UITableViewCell {
 
     struct ViewModel {
         let logo: UIImage
+        let callback: (UITableViewCell) -> Void
     }
 
     enum Logo {
-        case inApp(from: UIImage)
         case needsFetching(from: URL, fallback: UIImage)
     }
 }
-
-//extension UIImageView {
-//
-//    public func transition(tImage image: UIImage?) {
-//        UIView.transition(with: self, duration: 0.3, options: [.transitionCrossDissolve], animations: { [weak self] in
-//            self?.image = image
-//        }, completion: nil)
-//    }
-//}
 
 extension UIImage {
 
