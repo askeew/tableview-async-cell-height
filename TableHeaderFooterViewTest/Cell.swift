@@ -5,7 +5,7 @@ import WebKit
 
 class Cell: UITableViewCell {
 
-    private var callback: (() -> Void)?
+    private var callback: ((UITableViewCell) -> Void)?
 
     private lazy var webView: WKWebView = {
         let view = WKWebView(frame: .zero)
@@ -48,7 +48,7 @@ class Cell: UITableViewCell {
 
     struct ViewModel {
         let htmlString: String
-        let callback: () -> Void
+        let callback: (UITableViewCell) -> Void
     }
 }
 
@@ -63,7 +63,7 @@ extension Cell: WKNavigationDelegate {
             constraint.priority = .defaultHigh
             constraint.isActive = true
             webView.setNeedsUpdateConstraints()
-            self.callback?()
+            self.callback?(self)
         }
     }
 }

@@ -3,6 +3,8 @@ import WebKit
 
 class ViewController: UITableViewController {
 
+    private var cellCache = [Int: UITableViewCell]()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.rowHeight = UITableView.automaticDimension
@@ -19,10 +21,14 @@ class ViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if let cell = cellCache[indexPath.row] {
+            return cell
+        }
         guard let cell = tableView.dequeueReusableCell(withIdentifier: Cell.reuseIdentifier, for: indexPath) as? Cell else { return UITableViewCell() }
-        cell.update(with: Cell.ViewModel(htmlString: modelData[indexPath.row], callback: {
+        cell.update(with: Cell.ViewModel(htmlString: modelData[indexPath.row], callback: { [weak self] cell in
             tableView.beginUpdates()
             tableView.endUpdates()
+            self?.cellCache[indexPath.row] = cell
         }))
         return cell
     }
