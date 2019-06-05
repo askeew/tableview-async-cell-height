@@ -23,13 +23,9 @@ class Cell: UITableViewCell {
     }
 
     func update(with vm: ViewModel) {
-        let resizedImage = resize(image: vm.logo, newWidth: frame.width)
+        let resizedImage = vm.logo.resizeImageTo(newWidth: frame.width)
         myImage.image = resizedImage
         vm.callback(self)
-    }
-
-    private func resize(image: UIImage, newWidth: CGFloat) -> UIImage? {
-        return image.resizeImageTo(newWidth: frame.width)
     }
 
     private func setupConstraints() {
@@ -43,7 +39,6 @@ class Cell: UITableViewCell {
 
     private func setupViews() {
         addSubview(myImage)
-        backgroundColor = .white
         selectionStyle = .none
     }
 
